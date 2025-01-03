@@ -121,6 +121,9 @@ services:
     command: webserver
     ports:
       - "8080:8080"
+    environment:
+      <<: *airflow-common-env
+      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -136,6 +139,9 @@ services:
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
+    environment:
+      <<: *airflow-common-env
+      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -165,6 +171,7 @@ services:
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
+      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
