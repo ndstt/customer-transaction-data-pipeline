@@ -1,3 +1,4 @@
 logs/
 model-zoo-444708-e2-0b9701afda8d.json
 dags/__pycache__/
+test/
