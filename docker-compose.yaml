@@ -46,13 +46,15 @@
 ---
 x-airflow-common:
   &airflow-common
+  build: .
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.3}
+  image: custom-airflow:latest
   # build: .
   environment:
     &airflow-common-env
+    GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/keys/model-zoo-444708-e2-0b9701afda8d.json
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
@@ -76,8 +78,10 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
+    - /c/Users/nadda/Desktop/data-eng/customer-transaction-data-pipeline/model-zoo-444708-e2-0b9701afda8d.json:/opt/airflow/keys/model-zoo-444708-e2-0b9701afda8d.json
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -123,7 +127,6 @@ services:
       - "8080:8080"
     environment:
       <<: *airflow-common-env
-      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -141,7 +144,6 @@ services:
     command: scheduler
     environment:
       <<: *airflow-common-env
-      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -171,7 +173,6 @@ services:
       # Required to handle warm shutdown of the celery workers properly
       # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
       DUMB_INIT_SETSID: "0"
-      AIRFLOW__WEBSERVER__SECRET_KEY: d1dbd20e95f1b7a16c6790e3ad72bf22
     restart: always
     depends_on:
       <<: *airflow-common-depends-on
