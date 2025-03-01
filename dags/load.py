@@ -58,7 +58,7 @@ with DAG(
         postgres_conn_id = POSTGRES_CONN_ID,
         sql = """
             CREATE TABLE IF NOT EXISTS transaction (
-                transaction_id INTEGER PRIMARY KEY,
+                transaction_id SERIAL PRIMARY KEY,
                 customer_id INTEGER NOT NULL,
                 amount NUMERIC(10,2) NOT NULL,
                 timestamp TIMESTAMP NOT NULL,
