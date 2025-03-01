@@ -23,7 +23,7 @@ def synth_data(**kwargs):
     transactions = []
 
     for _ in range(500):
-        transaction_id = str(uuid.uuid4())
+        transaction_id = random.randint(1,1000000)
 
         #customer_id 10% missing
         customer_id = random.randint(1000, 9999) if random.random() > 0.1 else np.nan
